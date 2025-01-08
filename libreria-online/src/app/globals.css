@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Lexend', sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .no-drag {
+    -webkit-user-drag: none; /* Desactiva arrastrar en navegadores WebKit */
+    -moz-user-drag: none;    /* Desactiva arrastrar en navegadores Mozilla */
+    user-zoom: none;         /* Desactiva arrastrar en navegadores compatibles con la especificación */
+  }
+}
+
+
