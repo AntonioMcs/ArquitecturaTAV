@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Book } from "@/types";
+import path from "path";
 
 interface BookDetailsProps {
   params: { id: string };
@@ -55,13 +56,13 @@ const BookDetails = ({ params }: BookDetailsProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Imagen */}
         <div className="relative">
-          <Image
-            src={book.imagen_portada || "/placeholder.jpg"}
-            alt={book.titulo}
-            width={400}
-            height={600}
-            className="object-cover rounded-lg shadow-md"
-          />
+        <Image
+  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/img/${path.basename(book.imagen_portada)}` || "/placeholder.jpg"}
+  alt={book.titulo}
+  width={400}
+  height={600}
+  className="object-cover rounded-lg shadow-md"
+/>
         </div>
 
         {/* Información del libro */}
