@@ -1,7 +1,11 @@
-"use client"; 
+"use client";
 
 import React, { useState } from 'react';
 import useRegister from '../../hooks/Auth/useRegister';
+import Image from 'next/image';
+import Link from 'next/link';
+
+import Logo from '../../assets/img/Logo.svg';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -15,69 +19,89 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-80">
-        <h2 className="text-2xl font-bold mb-6 text-center">Registro</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-          />
-          <input
-            type="email"
-            placeholder="Correo electrónico"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-          />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-          />
+    <div className="h-screen w-full">
+      {/* Navbar */}
+      <nav className="h-[73px] w-full flex items-center justify-between px-4 md:px-8">
+        <Link href="/" passHref>
+          <Image src={Logo} alt="El Lector Logo" height={48} width={74} className="cursor-pointer" />
+        </Link>
+        <a href="/ayuda">
+          <button className="h-[40px] w-[120px] md:w-[185px] bg-[#F5F0F0] hover:bg-gray-300 text-[#800020] font-bold rounded-[12px] flex items-center justify-center">Ayuda</button>
+        </a>
+      </nav>
+
+      {/* Main Content */}
+      <main className="h-[calc(100vh-73px)] flex items-center justify-center px-4 md:px-0">
+        <div className="w-full max-w-[960px] h-auto md:h-[450px] flex flex-col justify-between items-center space-y-4 md:space-y-0">
           
-          {/* Botón personalizado */}
-          <button
-            type="submit"
-            className="relative group border-none bg-transparent p-0 outline-none cursor-pointer font-mono font-light uppercase text-base"
-          >
-            <span
-              className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-25 rounded-lg transform translate-y-0.5 transition duration-[600ms] ease-[cubic-bezier(0.3,0.7,0.4,1)] group-hover:translate-y-1 group-hover:duration-[250ms] group-active:translate-y-px"
-            ></span>
+          <form onSubmit={handleSubmit} className="w-full max-w-[480px] flex flex-col items-center space-y-4">
+            <h1 className="w-full text-[18px] md:text-[22px] font-bold mb-4 md:mb-6 text-center md:text-left">Crea una nueva cuenta</h1>
+            
+            {/* Nombre */}
+            <label className="w-full">
+              <span className="block text-left mb-2 text-sm md:text-base">Nombre completo</span>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full h-[40px] rounded-[12px] bg-[#F5F0F0] focus:outline-none focus:ring-2 focus:ring-red-600 px-3"
+              />
+            </label>
 
-            <span
-              className="absolute top-0 left-0 w-full h-full rounded-lg bg-gradient-to-l from-[hsl(217,33%,16%)] via-[hsl(217,33%,32%)] to-[hsl(217,33%,16%)]"
-            ></span>
+            {/* Correo Electrónico */}
+            <label className="w-full">
+              <span className="block text-left mb-2 text-sm md:text-base">Correo Electrónico</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full h-[40px] rounded-[12px] bg-[#F5F0F0] focus:outline-none focus:ring-2 focus:ring-red-600 px-3"
+              />
+            </label>
 
-            <div
-              className="relative flex items-center justify-between py-3 px-6 text-lg text-white rounded-lg transform -translate-y-1 bg-gradient-to-r from-[#f27121] via-[#e94057] to-[#8a2387] gap-3 transition duration-[600ms] ease-[cubic-bezier(0.3,0.7,0.4,1)] group-hover:-translate-y-1.5 group-hover:duration-[250ms] group-active:-translate-y-0.5 brightness-100 group-hover:brightness-110"
+            {/* Contraseña */}
+            <label className="w-full">
+              <span className="block text-left mb-2 text-sm md:text-base">Contraseña</span>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full h-[40px] rounded-[12px] bg-[#F5F0F0] focus:outline-none focus:ring-2 focus:ring-red-600 px-3"
+              />
+            </label>
+
+            {/* Botón Registrarse */}
+            <button 
+              type="submit" 
+              className="w-full h-[40px] bg-[#800020] text-[#FFFFFF] rounded-[12px] hover:bg-[#AB012B] transition"
             >
-              <span className="select-none">REGISTER</span>
+              Crear Cuenta
+            </button>
 
-              <svg
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="w-5 h-5 ml-2 -mr-1 transition duration-250 group-hover:translate-x-1"
+            {/* Botón Iniciar Sesión */}
+            <a className="w-full" href="/auth/login">
+              <button
+                type="button"
+                className="w-full h-[40px] bg-[#F5F0F0] text-gray-800 rounded-[12px] hover:bg-gray-200 transition"
               >
-                <path
-                  clipRule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  fillRule="evenodd"
-                ></path>
-              </svg>
-            </div>
-          </button>
-        </form>
-        {message && <p className="mt-4 text-center text-green-500">{message}</p>}
-      </div>
+                Iniciar Sesión
+              </button>
+            </a>
+          </form>
+
+          {message && <p className="mt-4 text-center text-green-500">{message}</p>}
+
+          {/* Texto de condiciones al fondo */}
+          <div className="w-full">
+            <p className="text-xs text-[#8C5E5E] text-center mt-20">
+              Al crear una cuenta, aceptas las <a href="#" className="underline">Condiciones de uso</a> y el <a href="#" className="underline">Aviso de privacidad</a> de El Lector.
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
