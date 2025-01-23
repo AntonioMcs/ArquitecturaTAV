@@ -9,17 +9,17 @@ const app = express();
 // Configuración de multer para subir archivos
 const storage = multer.diskStorage({
     destination: (_, _, cb) => {
-        cb(null, 'uploads/');
+        cb(null, 'uploads/'); // Directorio donde se guardarán las imágenes
     },
     filename: (_, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
+        cb(null, `${Date.now()}-${file.originalname}`); // Nombre único para cada archivo
     }
 });
 
 const upload = multer({ storage: storage });
 
 // Configuración de la conexión a la base de datos
-const db = mysql.createConnection({ 
+const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'admin',
@@ -49,6 +49,30 @@ app.post('/upload', upload.single('image'), (req, res) => {
             return res.status(500).send('Error al guardar la imagen en la base de datos');
         }
         res.send(`Imagen subida y asociada al libro con ID: ${bookId}`);
+    });
+});
+
+// Ruta para agregar un libro
+app.post('/books/add', (req, res) => {
+    const { titulo, autor, editorial, precio, stock, descripcion, id_categoria } = req.body;
+
+    // Validar los campos obligatorios
+    if (!titulo || !autor || !precio || !stock || !id_categoria) {
+        return res.status(400).json({ message: 'Todos los campos requeridos deben ser llenados.' });
+    }
+
+    const query = `
+        INSERT INTO productos (titulo, autor, editorial, precio, stock, descripcion, id_categoria)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [titulo, autor, editorial, precio, stock, descripcion, id_categoria];
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error('Error al añadir libro:', err);
+            return res.status(500).json({ message: 'Hubo un problema al añadir el libro.', error: err });
+        }
+        res.status(201).json({ message: 'Libro añadido con éxito', id: result.insertId });
     });
 });
 

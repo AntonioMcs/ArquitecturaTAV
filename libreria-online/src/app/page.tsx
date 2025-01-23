@@ -44,11 +44,8 @@ const Header = () => {
         <Link href="/contact" className="bg-[#ffcc00] text-[#800020] px-4 py-2 rounded transition duration-300 hover:bg-[#e6b800] hover:text-white">
           Contacto
         </Link>
-        <Link href="/books/non-fiction" className="bg-[#ffcc00] text-[#800020] px-4 py-2 rounded transition duration-300 hover:bg-[#e6b800] hover:text-white">
-          Non-Fiction
-        </Link>
-        <Link href="/books/childrens" className="bg-[#ffcc00] text-[#800020] px-4 py-2 rounded transition duration-300 hover:bg-[#e6b800] hover:text-white">
-          Childrens Books
+        <Link href="/add-book" className="bg-[#ffcc00] text-[#800020] px-4 py-2 rounded transition duration-300 hover:bg-[#e6b800] hover:text-white">
+          Añadir Libro
         </Link>
       </div>
     </header>
