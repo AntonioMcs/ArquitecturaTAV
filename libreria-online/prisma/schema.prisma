@@ -46,6 +46,7 @@ model comentarios_libro {
   @@index([id_usuario], map: "id_usuario")
 }
 
+
 model comentarios_perfil {
   id_comentario    Int              @id @default(autoincrement())
   id_perfil        Int?
@@ -133,9 +134,18 @@ model productos {
   fecha_registro    DateTime?           @default(now()) @db.Timestamp(0)
   carrito_compras   carrito_compras[]
   comentarios_libro comentarios_libro[]
+  comentarios_anonimos ComentarioAnonimo[] // Relación con comentarios anónimos
   categorias        categorias?         @relation(fields: [id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction, map: "productos_ibfk_1")
 
   @@index([id_categoria], map: "id_categoria")
+}
+
+model ComentarioAnonimo {
+  id_comentario    Int      @id @default(autoincrement())
+  id_producto      Int
+  comentario       String   @db.Text
+  fecha_comentario DateTime @default(now()) @db.Timestamp(0)
+  producto         productos @relation(fields: [id_producto], references: [id_producto])
 }
 
 model temas_colores {
