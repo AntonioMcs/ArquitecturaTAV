@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Book } from "@/types";
 
 interface BookDetailsProps {
@@ -8,7 +9,7 @@ interface BookDetailsProps {
 }
 
 interface Comment {
-  id: string;
+  id_comentario: string;
   comentario: string;
   fecha_comentario: string;
 }
@@ -83,15 +84,32 @@ const BookDetails = ({ params }: BookDetailsProps) => {
 
   return (
     <>
+      {/* Barra de navegación */}
+      <nav className="bg-red-600 p-4">
+        <div className="container mx-auto flex justify-between items-center">
+          <Link href="/" className="text-white text-lg font-semibold">
+            Inicio
+          </Link>
+          <div>
+            <Link href="/auth/login" className="text-red-600 bg-white border border-red-600 py-2 px-4 rounded-lg mr-4 hover:bg-red-100 transition-colors duration-300">
+              Iniciar Sesión
+            </Link>
+            <Link href="/auth/register" className="text-red-600 bg-white border border-red-600 py-2 px-4 rounded-lg hover:bg-red-100 transition-colors duration-300">
+              Registrarse
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       <div className="max-w-7xl mx-auto p-6 pt-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             {book.imagen_portada && (
-              <div className="relative h-64">
+              <div className="relative">
                 <img
                   src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${book.imagen_portada}`}
                   alt={book.titulo}
-                  className="w-full h-full object-cover"
+                  className="w-full h-auto object-contain"
                 />
               </div>
             )}
@@ -145,7 +163,7 @@ const BookDetails = ({ params }: BookDetailsProps) => {
           <div>
             {comments.length > 0 ? (
               comments.map((comment) => (
-                <div key={comment.id} className="bg-gray-100 p-4 rounded-lg mb-3">
+                <div key={comment.id_comentario} className="bg-gray-100 p-4 rounded-lg mb-3">
                   <p className="text-gray-700">{comment.comentario}</p>
                   <p className="text-sm text-gray-500">{new Date(comment.fecha_comentario).toLocaleString()}</p>
                 </div>

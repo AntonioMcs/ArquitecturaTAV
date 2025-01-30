@@ -27,6 +27,23 @@ const BooksList = () => {
 
   return (
     <>
+      {/* Barra de navegación */}
+      <nav className="bg-red-600 p-4">
+        <div className="container mx-auto flex justify-between items-center">
+          <Link href="/" className="text-white text-lg font-semibold">
+            Inicio
+          </Link>
+          <div>
+            <Link href="/auth/login" className="text-red-600 bg-white border border-red-600 py-2 px-4 rounded-lg mr-4 hover:bg-red-100 transition-colors duration-300">
+              Iniciar Sesión
+            </Link>
+            <Link href="/auth/register" className="text-red-600 bg-white border border-red-600 py-2 px-4 rounded-lg hover:bg-red-100 transition-colors duration-300">
+              Registrarse
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       <div className="max-w-7xl mx-auto p-6 pt-24">
         <h1 className="text-3xl font-bold mb-6">Catálogo de Libros</h1>
         {errorMessage && <p className="text-red-600 font-medium mb-4">{errorMessage}</p>}

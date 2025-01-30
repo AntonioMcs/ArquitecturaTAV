@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { Book } from "@/types";
 
 const Header = () => {
   return (
@@ -52,4 +53,49 @@ const Header = () => {
   );
 };
 
-export default Header;
+const HomePage = () => {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/books`);
+        if (!response.ok) throw new Error("Error al obtener los libros");
+        const data: Book[] = await response.json();
+        setBooks(data);
+      } catch (error: unknown) {
+        console.error("Error al cargar los datos:", error);
+        setErrorMessage("Error al cargar los datos de los libros");
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
+  return (
+    <>
+      <Header />
+      <div className="max-w-7xl mx-auto p-6 pt-24">
+        <h1 className="text-3xl font-bold mb-6">Libros Añadidos</h1>
+        {errorMessage && <p className="text-red-600 font-medium mb-4">{errorMessage}</p>}
+        <div className="overflow-x-auto">
+          <div className="flex space-x-4">
+            {books.map((book) => (
+              <Link key={book.id_producto} href={`/books/${book.id_producto}`} className="bg-white rounded-lg shadow-lg p-4 hover:bg-gray-100 transition duration-300 min-w-[200px]">
+                <h3 className="text-lg font-semibold mb-2">{book.titulo}</h3>
+                <p className="text-gray-600 text-sm mb-1">Autor: {book.autor}</p>
+                <p className="text-red-600 font-bold mb-4">${book.precio}</p>
+                <button className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors duration-300">
+                  Ver Detalles
+                </button>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default HomePage;
