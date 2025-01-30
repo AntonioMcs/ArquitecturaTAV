@@ -55,28 +55,27 @@ const BookDetails = ({ params }: BookDetailsProps) => {
       setErrorMessage("El comentario no puede estar vacío.");
       return;
     }
-
+  
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/books/${id}/comments/anonymous`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          comentario: newComment,
-        }),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ comentario: newComment }),
       });
-
+  
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al publicar el comentario.");
+        throw new Error('Error al publicar comentario');
       }
-
-      const addedComment: Comment = await response.json();
-      setComments([...comments, addedComment]);
-      setNewComment("");
+  
+      const addedComment = await response.json();
+      setComments([addedComment, ...comments]);
+      setNewComment('');
       setErrorMessage(null);
-    } catch (error: unknown) {
-      console.error("Error al enviar comentario:", error);
-      setErrorMessage((error as Error).message);
+    } catch (error) {
+      console.error('Error:', error);
+      setErrorMessage('Error al publicar el comentario');
     }
   };
 
@@ -181,5 +180,6 @@ const BookDetails = ({ params }: BookDetailsProps) => {
     </>
   );
 };
+
 
 export default BookDetails;

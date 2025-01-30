@@ -43,19 +43,20 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: 'Error al obtener el libro' });
   }
 });
-
 // Ruta para obtener comentarios de un libro por ID
 router.get('/:id/comments', async (req, res) => {
   const { id } = req.params;
   try {
-    const comments = await prisma.comentariosAnonimos.findMany({
-      where: { id_producto: parseInt(id) },
-    });
-
-    res.status(200).json(comments);
+    const comments = await prisma.$queryRaw`
+      SELECT id_comentario, id_producto, comentario, fecha_comentario 
+      FROM comentarioanonimo 
+      WHERE id_producto = ${parseInt(id)}
+      ORDER BY fecha_comentario DESC
+    `;
+    res.json(comments);
   } catch (error) {
-    console.error('Error al obtener los comentarios:', error);
-    res.status(500).json({ message: 'Error al obtener los comentarios' });
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ message: 'Error al obtener comentarios' });
   }
 });
 
@@ -64,25 +65,22 @@ router.post('/:id/comments/anonymous', async (req, res) => {
   const { id } = req.params;
   const { comentario } = req.body;
 
-  if (!comentario.trim()) {
+  if (!comentario?.trim()) {
     return res.status(400).json({ message: 'El comentario no puede estar vacío.' });
   }
 
   try {
-    const newComment = await prisma.comentariosAnonimos.create({
+    const newComment = await prisma.comentarioanonimo.create({
       data: {
         id_producto: parseInt(id),
-        comentario,
-      },
+        comentario: comentario.trim(),
+        fecha_comentario: new Date()
+      }
     });
-
     res.status(201).json(newComment);
   } catch (error) {
-    console.error('Error al añadir comentario anónimo:', error); // Log de error
-    res.status(500).json({ 
-      message: 'No se pudo publicar el comentario anónimo.', 
-      error: error.message 
-    });
+    console.error('Error adding comment:', error);
+    res.status(500).json({ message: 'Error al añadir comentario' });
   }
 });
 

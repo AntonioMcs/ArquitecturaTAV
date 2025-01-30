@@ -2,6 +2,7 @@
 const express = require('express');
 const multer = require('multer');
 const mysql = require('mysql2');
+const _prisma = require('./prismaClient');
 
 // Creación de la aplicación Express
 const app = express();
@@ -87,6 +88,69 @@ app.get('/books', (_, res) => {
     });
 });
 
+// Configuración de la conexión a la base de datos para comentarios
+db.changeUser({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+}, (err) => {
+    if (err) {
+        console.error('Error al cambiar la configuración de la base de datos:', err);
+    } else {
+        console.log('Configuración de la base de datos cambiada');
+    }
+});
+
+// Ruta para obtener comentarios
+app.get('/api/books/:id/comments', (req, res) => {
+    const bookId = req.params.id;
+    const query = `
+        SELECT id_comentario, id_producto, comentario, fecha_comentario 
+        FROM comentarioanonimo 
+        WHERE id_producto = ? 
+        ORDER BY fecha_comentario DESC
+    `;
+
+    db.query(query, [bookId], (err, results) => {
+        if (err) {
+            console.error('Error al obtener comentarios:', err);
+            return res.status(500).json({ message: 'Error al obtener comentarios' });
+        }
+        res.json(results);
+    });
+});
+
+// Ruta para agregar comentario
+app.post('/api/books/:id/comments/anonymous', (req, res) => {
+    const bookId = req.params.id;
+    const { comentario } = req.body;
+
+    if (!comentario || comentario.trim() === '') {
+        return res.status(400).json({ message: 'El comentario no puede estar vacío.' });
+    }
+
+    const query = `
+        INSERT INTO comentarioanonimo (id_producto, comentario, fecha_comentario) 
+        VALUES (?, ?, NOW())
+    `;
+
+    db.query(query, [bookId, comentario], (err, result) => {
+        if (err) {
+            console.error('Error al añadir comentario:', err);
+            return res.status(500).json({ message: 'Error al añadir comentario' });
+        }
+
+        const newComment = {
+            id_comentario: result.insertId,
+            id_producto: parseInt(bookId),
+            comentario: comentario,
+            fecha_comentario: new Date()
+        };
+
+        res.status(201).json(newComment);
+    });
+});
 // Iniciar el servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
