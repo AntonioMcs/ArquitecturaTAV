@@ -117,12 +117,16 @@ const BookDetails = ({ params }: BookDetailsProps) => {
 
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-6">{book.titulo}</h2>
+            <p className="text-lg text-gray-700 mb-4">{book.descripcion}</p>
             <div className="space-y-4">
               <p className="text-lg text-gray-700">
                 <span className="font-semibold">Autor:</span> {book.autor}
               </p>
               <p className="text-lg text-gray-700">
                 <span className="font-semibold">Editorial:</span> {book.editorial || "Sin información"}
+              </p>
+              <p className="text-lg text-gray-700">
+                <span className="font-semibold">Fecha de Publicación:</span> {book.fecha_publicacion ? new Date(book.fecha_publicacion).toLocaleDateString() : "Sin información"}
               </p>
               <p className="text-2xl text-red-600 font-bold my-6">
                 ${book.precio}
