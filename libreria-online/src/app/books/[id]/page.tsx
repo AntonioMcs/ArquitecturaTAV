@@ -79,36 +79,62 @@ const BookDetails = ({ params }: BookDetailsProps) => {
     }
   };
 
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return null;
+    return `${process.env.NEXT_PUBLIC_BACKEND_URL}/${imagePath.replace(/\\/g, '/')}`;
+  };
+
   if (!book) return <p>Cargando libro...</p>;
 
   return (
     <>
       {/* Barra de navegación */}
-      <nav className="bg-red-600 p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="text-white text-lg font-semibold">
-            Inicio
+      <nav className="bg-[#800020] py-2.5 border-b border-[#ffcc00] fixed w-full top-0 z-50">
+        <div className="container mx-auto px-4 flex justify-between items-center h-12">
+          <Link 
+            href="/" 
+            className="relative px-4 py-1.5 bg-[#800020] text-white font-semibold rounded-lg border-2 border-[#ffcc00] hover:border-[#e6b800] transition-all duration-300 hover:shadow-[0_0_20px_10px_rgba(255,204,0,0.3)] active:scale-95 group"
+          >
+            <span className="flex items-center space-x-2">
+              <span className="hidden sm:inline">Inicio</span>
+              <span className="sm:hidden">Home</span>
+            </span>
+            <span className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#ffcc00]/20 to-[#e6b800]/20"/>
           </Link>
-          <div>
-            <Link href="/auth/login" className="text-red-600 bg-white border border-red-600 py-2 px-4 rounded-lg mr-4 hover:bg-red-100 transition-colors duration-300">
-              Iniciar Sesión
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link 
+              href="/auth/login"
+              className="relative px-3 sm:px-4 py-1.5 bg-[#800020] text-white font-semibold rounded-lg border-2 border-[#ffcc00] hover:border-[#e6b800] transition-all duration-300 hover:shadow-[0_0_20px_10px_rgba(255,204,0,0.3)] active:scale-95 group text-sm sm:text-base"
+            >
+              <span className="flex items-center justify-center space-x-1">
+                <span className="hidden sm:inline">Iniciar Sesión</span>
+                <span className="sm:hidden">Login</span>
+              </span>
+              <span className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#ffcc00]/20 to-[#e6b800]/20"/>
             </Link>
-            <Link href="/auth/register" className="text-red-600 bg-white border border-red-600 py-2 px-4 rounded-lg hover:bg-red-100 transition-colors duration-300">
-              Registrarse
+            <Link 
+              href="/auth/register"
+              className="relative px-3 sm:px-4 py-1.5 bg-[#800020] text-white font-semibold rounded-lg border-2 border-[#ffcc00] hover:border-[#e6b800] transition-all duration-300 hover:shadow-[0_0_20px_10px_rgba(255,204,0,0.3)] active:scale-95 group text-sm sm:text-base"
+            >
+              <span className="flex items-center justify-center space-x-1">
+                <span className="hidden sm:inline">Registrarse</span>
+                <span className="sm:hidden">Register</span>
+              </span>
+              <span className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#ffcc00]/20 to-[#e6b800]/20"/>
             </Link>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto p-6 pt-24">
+      <div className="max-w-7xl mx-auto p-6 pt-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             {book.imagen_portada && (
-              <div className="relative">
+              <div className="relative h-[500px]">
                 <img
-                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${book.imagen_portada}`}
+                  src={getImageUrl(book.imagen_portada)}
                   alt={book.titulo}
-                  className="w-full h-auto object-contain"
+                  className="w-full h-full object-contain"
                 />
               </div>
             )}
@@ -127,14 +153,17 @@ const BookDetails = ({ params }: BookDetailsProps) => {
               <p className="text-lg text-gray-700">
                 <span className="font-semibold">Fecha de Publicación:</span> {book.fecha_publicacion ? new Date(book.fecha_publicacion).toLocaleDateString() : "Sin información"}
               </p>
-              <p className="text-2xl text-red-600 font-bold my-6">
+              <p className="text-2xl text-[#800020] font-bold my-6">
                 ${book.precio}
               </p>
               <p className="text-lg text-gray-700">
                 <span className="font-semibold">Disponibilidad:</span> {book.stock} disponibles
               </p>
-              <button className="w-full bg-red-600 text-white py-3 px-6 rounded-lg mt-8 hover:bg-red-700 transition-colors duration-300 font-medium">
-                Agregar al Carrito
+              <button className="relative w-full px-6 py-3 bg-[#800020] text-white font-semibold rounded-lg border-2 border-[#ffcc00] hover:border-[#e6b800] transition-all duration-300 hover:shadow-[0_0_20px_10px_rgba(255,204,0,0.3)] active:scale-95 group">
+                <span className="flex items-center justify-center space-x-2">
+                  <span>Agregar al Carrito</span>
+                </span>
+                <span className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#ffcc00]/20 to-[#e6b800]/20"/>
               </button>
             </div>
           </div>
@@ -149,16 +178,19 @@ const BookDetails = ({ params }: BookDetailsProps) => {
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 mt-2"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#800020] mt-2"
               rows={3}
               placeholder="Escribe un comentario..."
             />
-            {errorMessage && <p className="text-red-600 font-medium mt-2">{errorMessage}</p>}
+            {errorMessage && <p className="text-[#800020] font-medium mt-2">{errorMessage}</p>}
             <button
               onClick={handleCommentSubmit}
-              className="bg-red-600 text-white py-2 px-4 mt-2 rounded-lg hover:bg-red-700 transition-colors duration-300"
+              className="relative px-6 py-2 bg-[#800020] text-white font-semibold rounded-lg border-2 border-[#ffcc00] hover:border-[#e6b800] transition-all duration-300 hover:shadow-[0_0_20px_10px_rgba(255,204,0,0.3)] active:scale-95 group mt-2"
             >
-              Publicar Comentario
+              <span className="flex items-center justify-center space-x-2">
+                <span>Publicar Comentario</span>
+              </span>
+              <span className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-[#ffcc00]/20 to-[#e6b800]/20"/>
             </button>
           </div>
 
@@ -180,6 +212,5 @@ const BookDetails = ({ params }: BookDetailsProps) => {
     </>
   );
 };
-
 
 export default BookDetails;
