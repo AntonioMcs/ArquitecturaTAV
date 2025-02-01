@@ -1,25 +1,31 @@
-// Importación de los módulos necesarios
 const express = require('express');
 const multer = require('multer');
 const mysql = require('mysql2');
-const _prisma = require('./prismaClient');
+const cors = require('cors');
+const path = require('path');
+const bookRoutes = require('./routes/bookRoutes');
 
-// Creación de la aplicación Express
+// Express app initialization
 const app = express();
 
-// Configuración de multer para subir archivos
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+
+// Multer configuration
 const storage = multer.diskStorage({
     destination: (_, _, cb) => {
-        cb(null, 'uploads/'); // Directorio donde se guardarán las imágenes
+        cb(null, 'uploads/');
     },
     filename: (_, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`); // Nombre único para cada archivo
+        cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
 
 const upload = multer({ storage: storage });
 
-// Configuración de la conexión a la base de datos
+// Database configuration
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -27,7 +33,7 @@ const db = mysql.createConnection({
     database: 'datosbase'
 });
 
-// Conexión a la base de datos
+// Database connection
 db.connect((err) => {
     if (err) {
         console.error('Error al conectar a la base de datos:', err);
@@ -36,28 +42,24 @@ db.connect((err) => {
     }
 });
 
-// Middleware para parsear JSON
-app.use(express.json());
-
-// Ruta para subir la imagen y asociarla a un libro
+// Image upload route
 app.post('/upload', upload.single('image'), (req, res) => {
     const bookId = req.body.bookId;
     const imageUrl = req.file.path;
 
     const query = 'UPDATE productos SET imagen_portada = ? WHERE id_producto = ?';
-    db.query(query, [imageUrl, bookId], (err, _result) => {  // Prefijar 'result' con '_'
+    db.query(query, [imageUrl, bookId], (err) => {
         if (err) {
-            return res.status(500).send('Error al guardar la imagen en la base de datos');
+            return res.status(500).json({ message: 'Error al guardar la imagen en la base de datos' });
         }
-        res.send(`Imagen subida y asociada al libro con ID: ${bookId}`);
+        res.json({ message: 'Imagen subida exitosamente', imageUrl });
     });
 });
 
-// Ruta para agregar un libro
+// Books routes
 app.post('/books/add', (req, res) => {
     const { titulo, autor, editorial, precio, stock, descripcion, id_categoria } = req.body;
 
-    // Validar los campos obligatorios
     if (!titulo || !autor || !precio || !stock || !id_categoria) {
         return res.status(400).json({ message: 'Todos los campos requeridos deben ser llenados.' });
     }
@@ -71,38 +73,23 @@ app.post('/books/add', (req, res) => {
     db.query(query, values, (err, result) => {
         if (err) {
             console.error('Error al añadir libro:', err);
-            return res.status(500).json({ message: 'Hubo un problema al añadir el libro.', error: err });
+            return res.status(500).json({ message: 'Error al añadir el libro', error: err.message });
         }
         res.status(201).json({ message: 'Libro añadido con éxito', id: result.insertId });
     });
 });
 
-// Ruta para obtener la lista de libros
 app.get('/books', (_, res) => {
     const query = 'SELECT * FROM productos';
     db.query(query, (err, results) => {
         if (err) {
-            return res.status(500).send('Error al obtener la lista de libros');
+            return res.status(500).json({ message: 'Error al obtener la lista de libros' });
         }
         res.json(results);
     });
 });
 
-// Configuración de la conexión a la base de datos para comentarios
-db.changeUser({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-}, (err) => {
-    if (err) {
-        console.error('Error al cambiar la configuración de la base de datos:', err);
-    } else {
-        console.log('Configuración de la base de datos cambiada');
-    }
-});
-
-// Ruta para obtener comentarios
+// Comments routes
 app.get('/api/books/:id/comments', (req, res) => {
     const bookId = req.params.id;
     const query = `
@@ -111,7 +98,7 @@ app.get('/api/books/:id/comments', (req, res) => {
         WHERE id_producto = ? 
         ORDER BY fecha_comentario DESC
     `;
-
+    
     db.query(query, [bookId], (err, results) => {
         if (err) {
             console.error('Error al obtener comentarios:', err);
@@ -121,12 +108,11 @@ app.get('/api/books/:id/comments', (req, res) => {
     });
 });
 
-// Ruta para agregar comentario
 app.post('/api/books/:id/comments/anonymous', (req, res) => {
     const bookId = req.params.id;
     const { comentario } = req.body;
 
-    if (!comentario || comentario.trim() === '') {
+    if (!comentario?.trim()) {
         return res.status(400).json({ message: 'El comentario no puede estar vacío.' });
     }
 
@@ -151,8 +137,15 @@ app.post('/api/books/:id/comments/anonymous', (req, res) => {
         res.status(201).json(newComment);
     });
 });
-// Iniciar el servidor
-const PORT = process.env.PORT || 3000;
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Error interno del servidor' });
+});
+
+// Start server
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
+    console.log(`Servidor corriendo en puerto ${PORT}`);
 });

@@ -44,6 +44,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 // Ruta para obtener comentarios de un libro por ID
+// Ruta para obtener comentarios
 router.get('/:id/comments', async (req, res) => {
   const { id } = req.params;
   try {
@@ -60,7 +61,7 @@ router.get('/:id/comments', async (req, res) => {
   }
 });
 
-// Ruta para agregar un comentario anónimo
+// Ruta para agregar comentario anónimo
 router.post('/:id/comments/anonymous', async (req, res) => {
   const { id } = req.params;
   const { comentario } = req.body;
@@ -70,16 +71,26 @@ router.post('/:id/comments/anonymous', async (req, res) => {
   }
 
   try {
-    const newComment = await prisma.comentarioanonimo.create({
-      data: {
-        id_producto: parseInt(id),
-        comentario: comentario.trim(),
-        fecha_comentario: new Date()
-      }
-    });
-    res.status(201).json(newComment);
+    // Insertar comentario
+    await prisma.$queryRaw`
+      INSERT INTO comentarioanonimo (id_producto, comentario, fecha_comentario)
+      VALUES (${parseInt(id)}, ${comentario.trim()}, NOW())
+    `;
+
+    // Obtener el comentario recién insertado
+    const [insertedComment] = await prisma.$queryRaw`
+      SELECT id_comentario, id_producto, comentario, fecha_comentario
+      FROM comentarioanonimo
+      WHERE id_comentario = LAST_INSERT_ID()
+    `;
+
+    if (!insertedComment) {
+      throw new Error('Error al recuperar el comentario insertado');
+    }
+
+    res.status(201).json(insertedComment);
   } catch (error) {
-    console.error('Error adding comment:', error);
+    console.error('Error al añadir comentario:', error);
     res.status(500).json({ message: 'Error al añadir comentario' });
   }
 });
